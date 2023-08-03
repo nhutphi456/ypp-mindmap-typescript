@@ -1,58 +1,86 @@
-import {
-    Theme,
-    Extension,
-    Relationship,
-    Root,
-    RootTopic,
-    Children,
-  } from "./model";
-  
-  class RootNode implements Root {
-    constructor(
-      public id: string,
-      public rootTopic: RootTopic,
-      public relationships: Relationship[],
-      public title: string,
-      public extensions: Extension[],
-      public theme: Theme
-    ) {}
-  
-    createRelationship(end1Id: string, end2Id: string): void {
-      const newRelationship = {
-        id: Math.random().toString(),
-        end1Id,
-        end2Id,
-      };
-      this.relationships.push(newRelationship);
+import { IPointCoordinate, IRelationship } from "./model";
+import { swap, uniqueID } from "./utils/util";
+export class MindMap {
+  constructor(private root: RootNode = null) {}
+
+  addRootNode(title: string): RootNode {
+    const rootNodeId = uniqueID();
+    const rootNode = new RootNode(rootNodeId, null, title);
+    this.root = rootNode;
+    return rootNode;
+  }
+
+  addNode(parentId: string, title: string): Node | null {
+    const parent = this.findNode(this.root, parentId);
+    if (!parent) return null;
+    const nodeId = uniqueID();
+    const node = new Node(nodeId, parent.id, title);
+    parent.children.push(node);
+    return node;
+  }
+
+  findNode(node: Node, id: string): Node {
+    if (node.id === id) {
+      return node;
     }
-  
-    updateRelationship(relationship: Relationship): void {}
-    deleteRelationship(id: string): void {}
-  }
-  
-  class RootTopicNode implements RootTopic {
-    constructor(
-      public id: string,
-      public title: string,
-      public children: Children
-    ) {}
-  
-    createSub(id: string, subTitle: string): void {}
-  
-    updateSubTitle(id: string, title: string): void {}
-  
-    deleteSub(subId: string): void {}
-  
-    switchTwoSubs(firstId: string, secondId: string): void {}
-  }
-  
-  class AttachedNode extends RootTopicNode {
-    constructor(
-      public id: string,
-      public title: string,
-      public children: Children
-    ) {
-      super(id, title, children);
+
+    for (const child of node.children) {
+      const result = this.findNode(child, id);
+      if (result) {
+        return result;
+      }
     }
+
+    return null;
   }
-  
+
+  deleteNode(node: Node) {
+    const parent = this.findNode(this.root, node.parentId);
+    if (!parent) return null;
+    parent.children = parent.children.filter((child) => child.id !== node.id);
+  }
+
+  switchNodesWithSameParent(firstNode: Node, secondNode: Node) {
+    const nodeParentId = firstNode.parentId;
+
+    const parent = this.findNode(this.root, nodeParentId);
+    if (!parent) return null;
+    const childrenArr = parent.children;
+    const firstNodeIdx = childrenArr.findIndex(
+      (child) => child.id === firstNode.id
+    );
+    const secondNodeIdx = childrenArr.findIndex(
+      (child) => child.id === secondNode.id
+    );
+    swap(firstNodeIdx, secondNodeIdx, childrenArr);
+  }
+}
+
+export class Node {
+  constructor(
+    public id: string,
+    public parentId: string | null,
+    public title: string,
+    public children: Node[] = []
+  ) {}
+}
+export class RootNode extends Node {
+  constructor(
+    id: string,
+    parentId: null,
+    title: string,
+    children: Node[] = [],
+    public relationships: IRelationship[] = [],
+    public customWidth?: number,
+    public position?: IPointCoordinate
+  ) {
+    super(id, parentId, title, children);
+  }
+}
+
+let mindMap = new MindMap();
+const root = mindMap.addRootNode("Main topic");
+const child1 = mindMap.addNode(root.id, "child1");
+const child2 = mindMap.addNode(child1.id, "child2");
+
+// console.log(root);
