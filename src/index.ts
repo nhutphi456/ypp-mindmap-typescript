@@ -40,7 +40,7 @@ export class MindMap {
     parent.children = parent.children.filter((child) => child.id !== node.id);
   }
 
-  switchNodesWithSameParent(firstNode: Node, secondNode: Node) {
+  swapNodesInSameParent(firstNode: Node, secondNode: Node) {
     const nodeParentId = firstNode.parentId;
 
     const parent = this.findNode(this.root, nodeParentId);
@@ -82,5 +82,4 @@ let mindMap = new MindMap();
 const root = mindMap.addRootNode("Main topic");
 const child1 = mindMap.addNode(root.id, "child1");
 const child2 = mindMap.addNode(child1.id, "child2");
-
 // console.log(root);

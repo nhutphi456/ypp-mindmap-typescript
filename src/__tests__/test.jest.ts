@@ -23,7 +23,7 @@ describe("MindMap create node", () => {
   });
 });
 
-describe("Mindmap delete, switch node", () => {
+describe("Mindmap delete, swap node", () => {
   let mindMap: MindMap;
   let root: RootNode;
   let child1, child2, child3, child4, child5, child6: Node;
@@ -45,8 +45,8 @@ describe("Mindmap delete, switch node", () => {
     expect(child1.children.length).toBe(1);
   });
 
-  it("should switch node position", () => {
-    mindMap.switchNodesWithSameParent(child4, child5);
+  it("should swap node position", () => {
+    mindMap.swapNodesInSameParent(child4, child5);
     expect(child1.children[0].title).toBe("child5");
   });
 });

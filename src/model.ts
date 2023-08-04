@@ -1,18 +1,3 @@
-export interface IMindMap {
-  id: string;
-  root: IRootNode | null;
-}
-export interface IChildNode {
-  id: string;
-  title: string;
-  children: IChildNode[] | null;
-}
-export interface IRootNode extends IChildNode {
-  relationships: IRelationship[] | null;
-  customWidth?: number;
-  position?: IPointCoordinate;
-}
-
 export interface IRelationship {
   id: string;
   firstEndId: string;
