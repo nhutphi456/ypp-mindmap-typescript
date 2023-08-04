@@ -2,6 +2,7 @@ export interface IRelationship {
   id: string;
   firstEndId: string;
   secondEndId: string;
+  title?: string;
   controlPoints: IControlPoints;
   lineEndPoints: ILineEndPoints;
 }

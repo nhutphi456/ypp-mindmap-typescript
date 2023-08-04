@@ -61,8 +61,10 @@ export class Node {
     public id: string,
     public parentId: string | null,
     public title: string,
-    public children: Node[] = []
-  ) {}
+    public children: Node[] = [],
+    public customWidth?: number,
+    public position?: IPointCoordinate
+    ) {}
 }
 export class RootNode extends Node {
   constructor(
@@ -70,11 +72,11 @@ export class RootNode extends Node {
     parentId: null,
     title: string,
     children: Node[] = [],
+    customWidth?: number,
+    position?: IPointCoordinate,
     public relationships: IRelationship[] = [],
-    public customWidth?: number,
-    public position?: IPointCoordinate
   ) {
-    super(id, parentId, title, children);
+    super(id, parentId, title, children, customWidth, position);
   }
 }
 
