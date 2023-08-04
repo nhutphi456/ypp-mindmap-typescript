@@ -54,6 +54,12 @@ export class MindMap {
     );
     swap(firstNodeIdx, secondNodeIdx, childrenArr);
   }
+
+  updateNodeTitle(node: Node, newTitle: string): void {
+    const foundNode = this.findNode(this.root, node.id)
+    if(!foundNode) return null
+    foundNode.title = newTitle
+  }
 }
 
 export class Node {

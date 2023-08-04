@@ -45,8 +45,17 @@ describe("Mindmap delete, swap node", () => {
     expect(child1.children.length).toBe(1);
   });
 
-  it("should swap node position", () => {
+  it("should swap node position in the same parent", () => {
     mindMap.swapNodesInSameParent(child4, child5);
     expect(child1.children[0].title).toBe("child5");
   });
+
+  it('should update node title', () => {
+    mindMap.updateNodeTitle(child1, 'child1-changed')
+    expect(child1.title).toBe("child1-changed")
+  })
+
+  // it('should update node position', () => {
+  //   expect(child4.)
+  // })
 });
