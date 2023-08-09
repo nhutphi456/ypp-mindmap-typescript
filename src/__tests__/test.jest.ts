@@ -1,61 +1,54 @@
-import { MindMap, RootNode, Node } from "..";
+import { MindMap, Node } from "..";
 
-describe("MindMap create node", () => {
-  let mindMap: MindMap;
+describe("Create a new mind map file", () => {
+  it("should create a root node with four children nodes", () => {
+    const xMind = new MindMap();
+    expect(xMind.root.children.length).toEqual(4);
+  });
+});
 
+describe("Create children node", () => {
+  let xMind: MindMap;
   beforeAll(() => {
-    mindMap = new MindMap();
+    xMind = new MindMap();
   });
-
-  it("should create a root node", () => {
-    const root = mindMap.addRootNode("Main topic");
-    expect(root.title).toBe("Main topic");
+  it("should create a main topic node", () => {
+    const mainTopicFive = xMind.addNode(xMind.root, "Main Topic 5");
+    expect(xMind.root.children.length).toEqual(5);
+    expect(mainTopicFive.title).toBe("Main Topic 5");
   });
-
-  it("should create child node", () => {
-    const root = mindMap.addRootNode("Main topic");
-    const child1 = mindMap.addNode(root.id, "child1");
-    const child2 = mindMap.addNode(child1.id, "child2");
-    const child3 = mindMap.addNode(root.id, "child3");
-    expect(child1.title).toBe("child1");
-    expect(child2.title).toBe("child2");
-    expect(child3.title).toBe("child3");
+  it("should create a sub topic node", () => {
+    const mainTopic1 = xMind.root.children[0];
+    const subTopic1 = xMind.addNode(mainTopic1, "Sub Topic 1");
+    expect(subTopic1.title).toBe("Sub Topic 1");
+    expect(mainTopic1.children.length).toEqual(1);
   });
 });
 
-describe("Mindmap delete, swap node", () => {
-  let mindMap: MindMap;
-  let root: RootNode;
-  let child1, child2, child3, child4, child5, child6: Node;
-  beforeEach(() => {
-    mindMap = new MindMap();
-    root = mindMap.addRootNode("Main topic");
-    child1 = mindMap.addNode(root.id, "child1");
-    child2 = mindMap.addNode(root.id, "child2");
-    child3 = mindMap.addNode(root.id, "child3");
-    child4 = mindMap.addNode(child1.id, "child4");
-    child5 = mindMap.addNode(child1.id, "child5");
-    child6 = mindMap.addNode(child2.id, "child6");
+describe("Delete, Update node", () => {
+  let xMind: MindMap;
+  let mainTopic1, mainTopic2, subTopic1: Node;
+  beforeAll(() => {
+    xMind = new MindMap();
+    mainTopic1 = xMind.root.children[0];
+    mainTopic2 = xMind.root.children[1];
+    subTopic1 = xMind.addNode(mainTopic1, "Sub Topic 1");
   });
 
-  it("should delete a node", () => {
-    mindMap.deleteNode(child2);
-    mindMap.deleteNode(child4);
-    expect(root.children.length).toBe(2);
-    expect(child1.children.length).toBe(1);
+  it("should update node title", () => {
+    xMind.updateNodeTitle(subTopic1, "Sub Topic 1 title changed");
+    expect(subTopic1.title).toBe("Sub Topic 1 title changed");
   });
 
-  it("should swap node position in the same parent", () => {
-    mindMap.swapNodesInSameParent(child4, child5);
-    expect(child1.children[0].title).toBe("child5");
+  it("should delete a sub topic node", () => {
+    xMind.deleteNode(subTopic1);
+    expect(mainTopic1.children.length).toEqual(0);
   });
 
-  it('should update node title', () => {
-    mindMap.updateNodeTitle(child1, 'child1-changed')
-    expect(child1.title).toBe("child1-changed")
-  })
-
-  // it('should update node position', () => {
-  //   expect(child4.)
-  // })
+  it("should swap two nodes in same parent", () => {
+    xMind.swapNodesInSameParent(mainTopic1, mainTopic2)
+    expect(xMind.root.children[0].title).toBe("Main Topic 2")
+    expect(xMind.root.children[1].title).toBe("Main Topic 1")
+  });
 });
+
