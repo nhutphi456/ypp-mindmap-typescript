@@ -1,4 +1,4 @@
-import { IPointCoordinate, IRelationship } from "./model";
+import { IControlPoints, IPointCoordinate, TRelationship } from "./model";
 import { swap, uniqueID } from "./utils/util";
 export class MindMap {
   public root: RootNode = new RootNode("Central Topic");
@@ -19,6 +19,7 @@ export class MindMap {
 
     return defaultChildren;
   }
+
   addNode(parentNode: Node, title: string): Node | null {
     const parent = this.findNode(this.root, parentNode.id);
     if (!parent) return null;
@@ -66,7 +67,63 @@ export class MindMap {
     const secondNodeIdx = childrenArr.findIndex(
       (child) => child.id === secondNode.id
     );
+
+    if (firstNodeIdx < 0 || secondNodeIdx < 0) return;
     swap(firstNodeIdx, secondNodeIdx, childrenArr);
+  }
+
+  relocate(toNode: Node, node: Node, order: number): void {
+    //remove child from current node
+    const fromParent = this.findNode(this.root, node.parentId);
+    if (!fromParent) return;
+    fromParent.children.filter((child) => child.id === node.id);
+    //add child to new node
+    const toParent = this.findNode(this.root, toNode.id);
+    if (!toParent) return;
+    toParent.children.splice(order, 0, node);
+  }
+
+  /**
+   * MIND MAP RELATIONSHIPS
+   */
+  addRelationship(firstEnd: Node, secondEnd: Node): TRelationship {
+    const relationship: TRelationship = {
+      id: uniqueID(),
+      firstEndId: firstEnd.id,
+      secondEndId: secondEnd.id,
+    };
+    this.root.relationships.push(relationship);
+    return relationship;
+  }
+
+  deleteRelationship(id: string): void {
+    this.root.relationships = this.root.relationships.filter(
+      (relationship) => relationship.id !== id
+    );
+  }
+
+  updateRelationshipTitle(relationship: TRelationship, title: string): void {
+    const foundRelationship = this.findRelationshipById(relationship.id);
+    if (!foundRelationship) return;
+    Object.assign(foundRelationship, { title });
+  }
+
+  updateControlPoints(
+    relationship: TRelationship,
+    controlPoints: IControlPoints
+  ): void {
+    const foundRelationship = this.findRelationshipById(relationship.id);
+    if (!foundRelationship) return;
+    relationship.controlPoints = controlPoints;
+  }
+
+  findRelationshipById(id: string): TRelationship | undefined {
+    const rootRelationships = this.root.relationships;
+    const relationshipIndex = rootRelationships.findIndex(
+      (relationship) => relationship.id === id
+    );
+    if (relationshipIndex < 0) return undefined;
+    return rootRelationships[relationshipIndex];
   }
 }
 
@@ -83,7 +140,7 @@ export class Node {
   }
 }
 export class RootNode extends Node {
-  public relationships: IRelationship[];
+  public relationships: TRelationship[] = [];
   constructor(title: string) {
     super(title);
   }

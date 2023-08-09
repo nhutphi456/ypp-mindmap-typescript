@@ -8,15 +8,15 @@ export interface INode {
 }
 
 export interface IRootNode extends INode{
-  relationships: IRelationship[]
+  relationships: TRelationship[]
 } 
-export interface IRelationship {
+export type TRelationship = {
   id: string;
   firstEndId: string;
   secondEndId: string;
   title?: string;
-  controlPoints: IControlPoints;
-  lineEndPoints: ILineEndPoints;
+  controlPoints?: IControlPoints;
+  lineEndPoints?: ILineEndPoints;
 }
 
 export interface IControlPoints {
