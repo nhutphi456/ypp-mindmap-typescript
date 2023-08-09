@@ -1,3 +1,15 @@
+export interface INode {
+  id: string;
+  parentId: string | null;
+  title: string;
+  children: INode[];
+  customWidth?: number;
+  position?: IPointCoordinate;
+}
+
+export interface IRootNode extends INode{
+  relationships: IRelationship[]
+} 
 export interface IRelationship {
   id: string;
   firstEndId: string;
@@ -21,3 +33,5 @@ export interface IPointCoordinate {
   x: number;
   y: number;
 }
+
+
