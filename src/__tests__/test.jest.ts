@@ -1,5 +1,5 @@
 import { MindMap, Node } from "..";
-import { IControlPoints, TRelationship } from "../model";
+import { Points, Relationship } from "../model";
 
 describe("Create a new mind map file", () => {
   it("should create a root node with four children nodes", () => {
@@ -80,7 +80,7 @@ describe("Relocate node", () => {
 describe("Mind map relationship", () => {
   let xMind: MindMap;
   let mainTopic1, mainTopic2, subTopic1: Node;
-  let relationship1, relationship2: TRelationship;
+  let relationship1, relationship2: Relationship;
 
   beforeAll(() => {
     xMind = new MindMap();
@@ -106,7 +106,7 @@ describe("Mind map relationship", () => {
   });
 
   it("should update control points", () => {
-    const controlPoints: IControlPoints = {
+    const controlPoints: Points = {
       firstNode: {
         x: 12.265464,
         y: 56.026556
@@ -118,5 +118,20 @@ describe("Mind map relationship", () => {
     }
     xMind.updateControlPoints(relationship2, controlPoints)
     expect(relationship2.controlPoints).toEqual(controlPoints)
+  })
+
+  it("should update line end points", () => {
+    const lineEndPoints: Points = {
+      firstNode: {
+        x: 12.265464,
+        y: 56.026556
+      },
+      secondNode: {
+        x: 22.36698,
+        y: 14.23698
+      }
+    }
+    xMind.updateControlPoints(relationship2, lineEndPoints)
+    expect(relationship2.controlPoints).toEqual(lineEndPoints)
   })
 });

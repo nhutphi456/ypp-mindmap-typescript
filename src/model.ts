@@ -1,35 +1,30 @@
-export interface INode {
-  id: string;
-  parentId: string | null;
-  title: string;
-  children: INode[];
-  customWidth?: number;
-  position?: IPointCoordinate;
-}
+// export interface INode {
+//   id: string;
+//   parentId: string | null;
+//   title: string;
+//   children: INode[];
+//   customWidth?: number;
+//   position?: PointCoordinate;
+// }
 
-export interface IRootNode extends INode{
-  relationships: TRelationship[]
-} 
-export type TRelationship = {
+// export interface IRootNode extends INode{
+//   relationships: Relationship[]
+// } 
+export type Relationship = {
   id: string;
   firstEndId: string;
   secondEndId: string;
   title?: string;
-  controlPoints?: IControlPoints;
-  lineEndPoints?: ILineEndPoints;
+  controlPoints?: Points;
+  lineEndPoints?: Points;
 }
 
-export interface IControlPoints {
-  firstNode: IPointCoordinate;
-  secondNode: IPointCoordinate;
+export type Points = {
+  firstNode: PointCoordinate;
+  secondNode: PointCoordinate;
 }
 
-export interface ILineEndPoints {
-  firstNode: IPointCoordinate;
-  secondNode: IPointCoordinate;
-}
-
-export interface IPointCoordinate {
+export type PointCoordinate = {
   x: number;
   y: number;
 }

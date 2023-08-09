@@ -1,4 +1,4 @@
-import { IControlPoints, IPointCoordinate, TRelationship } from "./model";
+import { Points, PointCoordinate, Relationship } from "./model";
 import { swap, uniqueID } from "./utils/util";
 export class MindMap {
   public root: RootNode = new RootNode("Central Topic");
@@ -86,8 +86,8 @@ export class MindMap {
   /**
    * MIND MAP RELATIONSHIPS
    */
-  addRelationship(firstEnd: Node, secondEnd: Node): TRelationship {
-    const relationship: TRelationship = {
+  addRelationship(firstEnd: Node, secondEnd: Node): Relationship {
+    const relationship: Relationship = {
       id: uniqueID(),
       firstEndId: firstEnd.id,
       secondEndId: secondEnd.id,
@@ -102,22 +102,25 @@ export class MindMap {
     );
   }
 
-  updateRelationshipTitle(relationship: TRelationship, title: string): void {
+  updateRelationshipTitle(relationship: Relationship, title: string): void {
     const foundRelationship = this.findRelationshipById(relationship.id);
     if (!foundRelationship) return;
     Object.assign(foundRelationship, { title });
   }
 
-  updateControlPoints(
-    relationship: TRelationship,
-    controlPoints: IControlPoints
-  ): void {
+  updateControlPoints(relationship: Relationship, controlPoints: Points): void {
     const foundRelationship = this.findRelationshipById(relationship.id);
     if (!foundRelationship) return;
     relationship.controlPoints = controlPoints;
   }
 
-  findRelationshipById(id: string): TRelationship | undefined {
+  updateLineEndPoints(relationship: Relationship, lineEndPoints: Points): void {
+    const foundRelationship = this.findRelationshipById(relationship.id);
+    if (!foundRelationship) return;
+    relationship.lineEndPoints = lineEndPoints;
+  }
+
+  findRelationshipById(id: string): Relationship | undefined {
     const rootRelationships = this.root.relationships;
     const relationshipIndex = rootRelationships.findIndex(
       (relationship) => relationship.id === id
@@ -133,14 +136,14 @@ export class Node {
   public title: string;
   public children: Node[] = [];
   public customWidth?: number;
-  public position?: IPointCoordinate;
+  public position?: PointCoordinate;
 
   constructor(title: string) {
     this.title = title;
   }
 }
 export class RootNode extends Node {
-  public relationships: TRelationship[] = [];
+  public relationships: Relationship[] = [];
   constructor(title: string) {
     super(title);
   }
