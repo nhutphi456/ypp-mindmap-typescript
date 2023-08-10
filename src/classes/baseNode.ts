@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { PointCoordinate } from "../models/model";
 import { Node } from "./node";
+import { removeItemById } from "../utils/util";
 
 export class BaseNode {
   public id: string;
@@ -19,14 +20,12 @@ export class BaseNode {
     return this.children;
   }
 
-  addChildNode(title: string): BaseNode {
-    const node = new BaseNode(title)
+  addChildNode(node: BaseNode): BaseNode {
     this.children.push(node)
     return node
   }
 
   deleteChildNode(id: string): void {
-    const newChildren = this.children.filter(child => child.id !== id)
-    this.children = newChildren
+    this.children = removeItemById(id, this.children)
   }
 }

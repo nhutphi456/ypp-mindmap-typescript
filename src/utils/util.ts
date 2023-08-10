@@ -7,3 +7,7 @@ export function swap<T>(
   array[firstIndex] = array[secondIndex];
   array[secondIndex] = temp;
 }
+
+export function removeItemById<T>(id: string, list: T[]): T[]{
+  return list.filter((list: any) => list.id !== id)
+}
