@@ -1,15 +1,3 @@
-// export interface INode {
-//   id: string;
-//   parentId: string | null;
-//   title: string;
-//   children: INode[];
-//   customWidth?: number;
-//   position?: PointCoordinate;
-// }
-
-// export interface IRootNode extends INode{
-//   relationships: Relationship[]
-// } 
 export type Relationship = {
   id: string;
   firstEndId: string;
@@ -30,3 +18,7 @@ export type PointCoordinate = {
 }
 
 
+export interface Children {
+  attached: Node[],
+  detached: Node[]
+}
