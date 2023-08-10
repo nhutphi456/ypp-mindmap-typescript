@@ -4,11 +4,11 @@ import { MindMap } from "../classes/mindMap";
 describe("Create a new mind map file", () => {
   it("should create a root node with four children nodes", () => {
     const xMind = new MindMap();
-    expect(xMind.root.getAttachedChildren().length).toEqual(4);
-    expect(xMind.root.getAttachedChildren()[0].title).toBe("Main Topic 1");
-    expect(xMind.root.getAttachedChildren()[1].title).toBe("Main Topic 2");
-    expect(xMind.root.getAttachedChildren()[2].title).toBe("Main Topic 3");
-    expect(xMind.root.getAttachedChildren()[3].title).toBe("Main Topic 4");
+    expect(xMind.root.getChildren().length).toEqual(4);
+    expect(xMind.root.getChildren()[0].title).toBe("Main Topic 1");
+    expect(xMind.root.getChildren()[1].title).toBe("Main Topic 2");
+    expect(xMind.root.getChildren()[2].title).toBe("Main Topic 3");
+    expect(xMind.root.getChildren()[3].title).toBe("Main Topic 4");
   });
 });
 
@@ -20,17 +20,17 @@ describe("Create nodes", () => {
   })
 
   it("should create sub topic nodes from main topic nodes", () => {
-    const mainTopic1 = xMind.root.getAttachedChildren()[0]
-    mainTopic1.addAttchedChild()
-    expect(mainTopic1.getAttachedChildren()[0].title).toBe('Sub topic 1')
-    expect(mainTopic1.getAttachedChildren().length).toEqual(1)
+    const mainTopic1 = xMind.root.getChildren()[0]
+    mainTopic1.addChildNode('Sub topic 1')
+    expect(mainTopic1.getChildren()[0].title).toBe('Sub topic 1')
+    expect(mainTopic1.getChildren().length).toEqual(1)
   })
 
-  it("should delete sub topic node from main topic node", () => {
-    const mainTopic1 = xMind.root.getAttachedChildren()[0]
-    const subTopic1 = mainTopic1.getAttachedChildren()[0]
-    mainTopic1.deleteAttachedChild(subTopic1.id)
-    expect(mainTopic1.getAttachedChildren().length).toEqual(0)
+  it("should delete a node", () => {
+    const mainTopic1 = xMind.root.getChildren()[0]
+    const subTopic1 = mainTopic1.getChildren()[0]
+    mainTopic1.deleteChildNode(subTopic1.id)
+    expect(mainTopic1.getChildren().length).toEqual(0)
   })
 })
 // describe("Create mind map nodes", () => {

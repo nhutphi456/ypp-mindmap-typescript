@@ -7,7 +7,7 @@ export class MindMap {
   public root: RootNode = new RootNode("Central Topic");
   constructor() {
     const defaultChildren = this.createDefaultChildrenNode();
-    this.root.setAttachedChildren(defaultChildren);
+    this.root.children = defaultChildren
   }
 
   private createDefaultChildrenNode(): Node[] {
@@ -17,17 +17,17 @@ export class MindMap {
       new Node("Main Topic 3"),
       new Node("Main Topic 4"),
     ];
-    defaultChildren.forEach((child: Node) => (child.parentId = this.root.id));
     return defaultChildren;
   }
 
   addAttachedNode(parentNode: Node, title: string): Node | null {
-    const parent = this.findNode(this.root, parentNode.id);
-    if (!parent) return null;
-    const node = new Node(title);
-    node.parentId = parent.id;
-    parent.getAttachedChildren().push(node);
-    return node;
+    // const parent = this.findNode(this.root, parentNode.id);
+    // if (!parent) return null;
+    // const node = new Node(title);
+    // node.parentId = parent.id;
+    // parent.getAttachedChildren().push(node);
+    // return node;
+    return null
   }
 
   findNode(node: Node, id: string): Node {
