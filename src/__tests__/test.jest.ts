@@ -1,6 +1,7 @@
 import { BaseNode } from "../classes/baseNode";
 import { MindMap } from "../classes/mindMap";
-import { Node } from "../classes/node";
+import { RootNode } from "../classes/rootNode";
+import { Points, Relationship } from "../models/model";
 
 describe("Create a new mind map file", () => {
   it("should create a root node with four children nodes", () => {
@@ -13,7 +14,7 @@ describe("Create a new mind map file", () => {
   });
 });
 
-describe("Create, Delete nodes", () => {
+describe("Create, Delete, Swap nodes", () => {
   let xMind: MindMap;
 
   beforeAll(() => {
@@ -49,6 +50,15 @@ describe("Create, Delete nodes", () => {
     xMind.root.deleteDetached(detachedNode.id);
     expect(xMind.root.getDetached().length).toEqual(0);
   });
+
+  it("should swap main topic 3 to main topic 4", () => {
+    const mainTopic3 = xMind.root.getChildren()[2];
+    const mainTopic4 = xMind.root.getChildren()[3];
+    xMind.root.swapTwoNodes(mainTopic3, mainTopic4)
+
+    expect(xMind.root.getChildren()[2].title).toBe("Main Topic 4")
+    expect(xMind.root.getChildren()[3].title).toBe("Main Topic 3")
+  })
 });
 
 describe("Detached node become child node", () => {
@@ -70,5 +80,67 @@ describe("Detached node become child node", () => {
     mainTopic1.addChildNode(detachedNode);
     expect(mainTopic1.getChildren().length).toEqual(1);
     expect(xMind.root.getDetached().length).toEqual(0);
+  });
+});
+
+describe("Mind map relationship", () => {
+  let xMind: MindMap;
+  let root: RootNode;
+  let mainTopic1, mainTopic2, subTopic1: BaseNode;
+  let relationship1, relationship2: Relationship;
+
+  beforeAll(() => {
+    xMind = new MindMap();
+    root = xMind.root;
+    mainTopic1 = xMind.root.getChildren()[0];
+    mainTopic2 = xMind.root.getChildren()[1];
+    subTopic1 = new BaseNode("Sub Topic 1");
+    mainTopic1.addChildNode(subTopic1);
+  });
+
+  it("should create relationship", () => {
+    relationship1 = root.addRelationship(mainTopic1, subTopic1);
+    relationship2 = root.addRelationship(mainTopic1, mainTopic2);
+    expect(root.getRelationships().length).toEqual(2);
+  });
+
+  it("should delete relationship", () => {
+    root.deleteRelationship(relationship1.id);
+    expect(xMind.root.getRelationships().length).toEqual(1);
+  });
+
+  it("should update relationship title", () => {
+    root.updateRelationshipTitle(relationship2, "Belong to");
+    expect(relationship2.title).toBe("Belong to");
+  });
+
+  it("should update control points", () => {
+    const controlPoints: Points = {
+      firstNode: {
+        x: 12.265464,
+        y: 56.026556,
+      },
+      secondNode: {
+        x: 22.36698,
+        y: 14.23698,
+      },
+    };
+    root.updateControlPoints(relationship2, controlPoints);
+    expect(relationship2.controlPoints).toEqual(controlPoints);
+  });
+
+  it("should update line end points", () => {
+    const lineEndPoints: Points = {
+      firstNode: {
+        x: 12.265464,
+        y: 56.026556,
+      },
+      secondNode: {
+        x: 22.36698,
+        y: 14.23698,
+      },
+    };
+    root.updateLineEndPoints(relationship2, lineEndPoints);
+    expect(relationship2.controlPoints).toEqual(lineEndPoints);
   });
 });
