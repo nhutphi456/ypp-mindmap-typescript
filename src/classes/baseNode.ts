@@ -1,25 +1,42 @@
 import { v4 as uuidv4 } from "uuid";
-import { PointCoordinate } from "../models/model";
+import { Position } from "../models/model";
 import { removeItemById, swap } from "../utils/util";
 
 export class BaseNode {
-  public id: string;
-  public title: string;
-  public children: BaseNode[];
-  public customWidth: number;
-  public position: PointCoordinate;
+  private id: string;
+  private title: string;
+  protected children: BaseNode[];
+  private position: Position;
+  public width: number;
+  public height: number;
 
   constructor(title: string) {
-    this.id = uuidv4();
+    this.id = uuidv4().toString();
     this.title = title;
     this.children = [];
   }
 
-  getChildren() {
+  getId (): string {
+    return this.id
+  }
+  getChildren(): BaseNode[] {
     return this.children;
   }
 
-  addChildNode(node: BaseNode): BaseNode {
+  getTitle(): string {
+    return this.title;
+  }
+
+  getPosition(): Position {
+    return this.position
+  }
+
+  setPosition(position: Position): void {
+    this.position = position
+  }
+
+  addChildNode(title: string): BaseNode {
+    const node = new BaseNode(title);
     this.children.push(node);
     return node;
   }
@@ -28,6 +45,19 @@ export class BaseNode {
     this.children = removeItemById(id, this.children);
   }
 
+  deleteChildrenNodes(nodeIds: string[]): void {
+    nodeIds.forEach((id) => {
+      this.deleteChildNode(id)
+    });
+  }
+
+  deleteChildrenByIdSet(idSet: string[]): void {
+    this.deleteChildrenNodes(idSet);
+    this.children.forEach((item) => {
+      item.deleteChildrenByIdSet(idSet);
+    });
+  }
+  
   swapTwoNodes(firstNode: BaseNode, secondNode: BaseNode): void {
     const firstNodeIndex = this.children.findIndex(
       (child) => child.id === firstNode.id

@@ -11,3 +11,4 @@ export function swap<T>(
 export function removeItemById<T>(id: string, list: T[]): T[]{
   return list.filter((list: any) => list.id !== id)
 }
+

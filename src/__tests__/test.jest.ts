@@ -1,99 +1,209 @@
 import { BaseNode } from "../classes/baseNode";
 import { MindMap } from "../classes/mindMap";
+import { Relationship } from "../classes/relationship";
 import { RootNode } from "../classes/rootNode";
-import { Points, Relationship } from "../models/model";
+
+const initMindMap = (): MindMap => {
+  const xMind = new MindMap();
+  xMind.createRoot("Central Topic");
+
+  const root = xMind.getRoot();
+  root.addChildNode("Main Topic 1");
+  root.addChildNode("Main Topic 2");
+  root.addChildNode("Main Topic 3");
+  root.addChildNode("Main Topic 4");
+
+  return xMind;
+};
 
 describe("Create a new mind map file", () => {
-  it("should create a root node with four children nodes", () => {
-    const xMind = new MindMap();
-    expect(xMind.root.getChildren().length).toEqual(4);
-    expect(xMind.root.getChildren()[0].title).toBe("Main Topic 1");
-    expect(xMind.root.getChildren()[1].title).toBe("Main Topic 2");
-    expect(xMind.root.getChildren()[2].title).toBe("Main Topic 3");
-    expect(xMind.root.getChildren()[3].title).toBe("Main Topic 4");
-  });
-});
-
-describe("Create, Delete, Swap nodes", () => {
-  let xMind: MindMap;
+  let root: RootNode;
 
   beforeAll(() => {
-    xMind = new MindMap();
+    root = initMindMap().getRoot();
+  });
+
+  it("should create a root node with four children nodes", () => {
+    expect(root.getTitle()).toEqual("Central Topic");
+    expect(root.getChildren().length).toEqual(4);
+    expect(root.getChildren()[0].getTitle()).toBe("Main Topic 1");
+    expect(root.getChildren()[1].getTitle()).toBe("Main Topic 2");
+    expect(root.getChildren()[2].getTitle()).toBe("Main Topic 3");
+    expect(root.getChildren()[3].getTitle()).toBe("Main Topic 4");
   });
 
   it("should create sub topic nodes from main topic nodes", () => {
-    const mainTopic1 = xMind.root.getChildren()[0];
-    const subTopic1 = new BaseNode("Sub topic 1");
-    mainTopic1.addChildNode(subTopic1);
-    expect(mainTopic1.getChildren()[0].title).toBe("Sub topic 1");
+    const mainTopic1 = root.getChildren()[0];
+
+    mainTopic1.addChildNode("Sub topic 1");
+
+    expect(mainTopic1.getChildren()[0].getTitle()).toBe("Sub topic 1");
     expect(mainTopic1.getChildren().length).toEqual(1);
   });
 
   it("should delete a node", () => {
-    const mainTopic1 = xMind.root.getChildren()[0];
+    const mainTopic1 = root.getChildren()[0];
     const subTopic1 = mainTopic1.getChildren()[0];
-    mainTopic1.deleteChildNode(subTopic1.id);
+
+    mainTopic1.deleteChildNode(subTopic1.getId());
+
     expect(mainTopic1.getChildren().length).toEqual(0);
   });
 
   it("should create a detached node", () => {
-    const detachedNode = xMind.root.addDetached("Floating topic");
-    const subTopic1 = new BaseNode("Sub topic 1");
-    detachedNode.addChildNode(subTopic1);
-    expect(detachedNode.title).toBe("Floating topic");
-    expect(xMind.root.getDetached().length).toEqual(1);
+    const detachedNode = root.addDetachedNode("Floating topic");
+
+    expect(detachedNode.getTitle()).toBe("Floating topic");
+    expect(root.getDetachedChildren().length).toEqual(1);
+  });
+
+  it("should create child node for detached node", () => {
+    const detachedNode = root.getDetachedChildren()[0];
+
+    detachedNode.addChildNode("Sub topic 1");
+
     expect(detachedNode.getChildren().length).toEqual(1);
+    expect(detachedNode.getChildren()[0].getTitle()).toBe("Sub topic 1");
   });
 
   it("should remove a detached node", () => {
-    const detachedNode = xMind.root.getDetached()[0];
-    xMind.root.deleteDetached(detachedNode.id);
-    expect(xMind.root.getDetached().length).toEqual(0);
+    const detachedNode = root.getDetachedChildren()[0];
+
+    expect(root.getDetachedChildren().length).toEqual(1);
+
+    root.deleteDetachedNode(detachedNode.getId());
+
+    expect(root.getDetachedChildren().length).toEqual(0);
   });
 
   it("should swap main topic 3 to main topic 4", () => {
-    const mainTopic3 = xMind.root.getChildren()[2];
-    const mainTopic4 = xMind.root.getChildren()[3];
-    xMind.root.swapTwoNodes(mainTopic3, mainTopic4)
+    const mainTopic3 = root.getChildren()[2];
+    const mainTopic4 = root.getChildren()[3];
 
-    expect(xMind.root.getChildren()[2].title).toBe("Main Topic 4")
-    expect(xMind.root.getChildren()[3].title).toBe("Main Topic 3")
-  })
+    root.swapTwoNodes(mainTopic3, mainTopic4);
+
+    expect(root.getChildren()[2].getTitle()).toBe("Main Topic 4");
+    expect(root.getChildren()[3].getTitle()).toBe("Main Topic 3");
+  });
 });
 
-describe("Detached node become child node", () => {
-  let xMind: MindMap;
-  let mainTopic1, detachedNode, subTopic1: BaseNode;
+describe("Test floating topic", () => {
+  let root: RootNode;
+  let mainTopic1, subTopic1, detachedNode: BaseNode;
 
   beforeAll(() => {
-    xMind = new MindMap();
-    mainTopic1 = xMind.root.getChildren()[0];
-    detachedNode = xMind.root.addDetached("Floating topic");
-    subTopic1 = new BaseNode("Sub topic 1");
-    detachedNode.addChildNode(subTopic1);
+    root = initMindMap().getRoot();
+    //create a sub topic for main topic 1
+    mainTopic1 = root.getChildren()[0];
+    subTopic1 = mainTopic1.addChildNode("Sub topic 1");
+    //create a floating topic
+    detachedNode = root.addDetachedNode("Floating topic");
   });
 
-  it("should detached become child node", () => {
-    //remove detached from root
-    xMind.root.deleteDetached(detachedNode.id);
-    //add detached node to main topic node
-    mainTopic1.addChildNode(detachedNode);
+  it("should floating topic become child of main topic 1", () => {
+    root.moveFloatingToChild(detachedNode, mainTopic1);
+
+    expect(mainTopic1.getChildren().length).toEqual(2);
+    expect(root.getDetachedChildren().length).toEqual(0);
+  });
+
+  it("should sub topic 1 become floating topic", () => {
+    root.moveChildToFloating(subTopic1, mainTopic1);
+
     expect(mainTopic1.getChildren().length).toEqual(1);
-    expect(xMind.root.getDetached().length).toEqual(0);
+    expect(root.getDetachedChildren().length).toEqual(1);
   });
 });
 
-describe("Mind map relationship", () => {
-  let xMind: MindMap;
+describe("Test move child", () => {
+  let root: RootNode;
+  let mainTopic1, mainTopic2, subTopic1: BaseNode;
+
+  beforeAll(() => {
+    root = initMindMap().getRoot();
+    mainTopic1 = root.getChildren()[0];
+    mainTopic2 = root.getChildren()[1];
+    subTopic1 = mainTopic1.addChildNode("Sub topic 1");
+  });
+
+  it("should move child from main topic 1 to main topic 2", () => {
+    root.moveChildren(subTopic1, mainTopic1, mainTopic2);
+
+    expect(mainTopic1.getChildren().length).toEqual(0);
+    expect(mainTopic2.getChildren().length).toEqual(1);
+    expect(mainTopic2.getChildren()[0].title).toBe("Sub topic 1");
+  });
+});
+
+describe("Test delete multiple nodes of same parent", () => {
+  let root: RootNode;
+  let mainTopic1, subTopic1, subTopic2, subTopic3, subTopic4: BaseNode;
+
+  beforeAll(() => {
+    root = initMindMap().getRoot();
+    mainTopic1 = root.getChildren()[0];
+    subTopic1 = mainTopic1.addChildNode("Sub topic 1");
+    subTopic2 = mainTopic1.addChildNode("Sub topic 2");
+    subTopic3 = mainTopic1.addChildNode("Sub topic 3");
+    subTopic4 = mainTopic1.addChildNode("Sub topic 4");
+  });
+
+  it("should delete all four sub topic node from main topic 1", () => {
+    expect(mainTopic1.getChildren().length).toEqual(4);
+
+    mainTopic1.deleteChildrenNodes([
+      subTopic1.getId(),
+      subTopic2.getId(),
+      subTopic3.getId(),
+      subTopic4.getId(),
+    ]);
+
+    expect(mainTopic1.getChildren().length).toEqual(0);
+  });
+});
+
+describe("Test delete multiple nodes", () => {
+  let root: RootNode;
+  let mainTopic1, mainTopic2, subTopic1, subTopic12, detachedTopic: BaseNode;
+
+  beforeAll(() => {
+    root = initMindMap().getRoot();
+    mainTopic1 = root.getChildren()[0];
+    mainTopic2 = root.getChildren()[1];
+    subTopic1 = mainTopic1.addChildNode("Sub topic 1");
+    subTopic12 = subTopic1.addChildNode("Sub topic 12");
+    detachedTopic = root.addDetachedNode("Floating topic");
+  });
+
+  it("should delete mainTopic2, subTopic12, and detachedTopic nodes", () => {
+    expect(root.getChildren().length).toEqual(4);
+    expect(subTopic1.getChildren().length).toEqual(1);
+    expect(root.getDetachedChildren().length).toEqual(1);
+
+    const deleledNodeIds = [
+      mainTopic2.getId(),
+      subTopic12.getId(),
+      detachedTopic.getId(),
+    ];
+
+    root.deleteByIds(deleledNodeIds);
+
+    expect(root.getChildren().length).toEqual(3);
+    expect(subTopic1.getChildren().length).toEqual(0);
+    expect(root.getDetachedChildren().length).toEqual(0);
+  });
+});
+
+//RELATIONSHIPS
+describe("Test mind map relationship", () => {
   let root: RootNode;
   let mainTopic1, mainTopic2, subTopic1: BaseNode;
   let relationship1, relationship2: Relationship;
 
   beforeAll(() => {
-    xMind = new MindMap();
-    root = xMind.root;
-    mainTopic1 = xMind.root.getChildren()[0];
-    mainTopic2 = xMind.root.getChildren()[1];
+    root = initMindMap().getRoot();
+    mainTopic1 = root.getChildren()[0];
+    mainTopic2 = root.getChildren()[1];
     subTopic1 = new BaseNode("Sub Topic 1");
     mainTopic1.addChildNode(subTopic1);
   });
@@ -101,46 +211,56 @@ describe("Mind map relationship", () => {
   it("should create relationship", () => {
     relationship1 = root.addRelationship(mainTopic1, subTopic1);
     relationship2 = root.addRelationship(mainTopic1, mainTopic2);
+
     expect(root.getRelationships().length).toEqual(2);
   });
 
   it("should delete relationship", () => {
     root.deleteRelationship(relationship1.id);
-    expect(xMind.root.getRelationships().length).toEqual(1);
+
+    expect(root.getRelationships().length).toEqual(1);
   });
 
-  it("should update relationship title", () => {
-    root.updateRelationshipTitle(relationship2, "Belong to");
-    expect(relationship2.title).toBe("Belong to");
-  });
-
-  it("should update control points", () => {
-    const controlPoints: Points = {
-      firstNode: {
-        x: 12.265464,
-        y: 56.026556,
-      },
-      secondNode: {
-        x: 22.36698,
-        y: 14.23698,
-      },
+  it("should update relationship", () => {
+    const mainTopic3 = root.getChildren()[2];
+    const newControlPoints = {
+      x: 15,
+      y: 20,
     };
-    root.updateControlPoints(relationship2, controlPoints);
-    expect(relationship2.controlPoints).toEqual(controlPoints);
-  });
 
-  it("should update line end points", () => {
-    const lineEndPoints: Points = {
-      firstNode: {
-        x: 12.265464,
-        y: 56.026556,
-      },
-      secondNode: {
-        x: 22.36698,
-        y: 14.23698,
-      },
-    };
-    root.updateLineEndPoints(relationship2, lineEndPoints);
-    expect(relationship2.controlPoints).toEqual(lineEndPoints);
+    relationship1.updateEndsNode(mainTopic1, mainTopic3, newControlPoints);
+
+    expect(relationship1.controlPoints).toEqual(newControlPoints);
+    expect(relationship1.firstEndId).toEqual(mainTopic1.getId());
+    expect(relationship1.secondEndId).toEqual(mainTopic3.getId());
   });
 });
+
+describe("draw mind map", () => {
+  let xMind: MindMap
+
+  beforeAll(() => {
+    xMind = initMindMap()
+  })
+
+  it("should display nodes", () => {
+    xMind.displayNode()
+    const root = xMind.getRoot()
+    const mainTopic1 = root.getChildren()[0]
+    const mainTopic2 = root.getChildren()[1]
+    const mainTopic3 = root.getChildren()[2]
+    const mainTopic4 = root.getChildren()[3]
+
+    expect(mainTopic1.getPosition().x).toEqual(250)
+    expect(mainTopic1.getPosition().y).toEqual(0)
+
+    expect(mainTopic2.getPosition().x).toEqual(250)
+    expect(mainTopic2.getPosition().y).toEqual(200)
+
+    expect(mainTopic3.getPosition().x).toEqual(250)
+    expect(mainTopic3.getPosition().y).toEqual(400)
+
+    expect(mainTopic4.getPosition().x).toEqual(250)
+    expect(mainTopic4.getPosition().y).toEqual(600)
+  })
+})

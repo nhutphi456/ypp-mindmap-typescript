@@ -1,77 +1,80 @@
-import { Points, Relationship } from "../models/model";
 import { removeItemById } from "../utils/util";
 import { BaseNode } from "./baseNode";
-import { Node } from "./node";
-import { v4 as uuidv4 } from "uuid";
+import { Relationship } from "./relationship";
 
 export class RootNode extends BaseNode {
-  public detached: BaseNode[];
-  public relationships: Relationship[];
+  private detachedChildren: BaseNode[];
+  private relationships: Relationship[];
+
   constructor(title: string) {
     super(title);
-    this.detached = [];
+    this.detachedChildren = [];
     this.relationships = [];
   }
 
-  getRelationships() {
+  getRelationships(): Relationship[] {
     return this.relationships;
   }
 
-  getDetached() {
-    return this.detached;
+  getDetachedChildren(): BaseNode[] {
+    return this.detachedChildren;
   }
 
-  addDetached(title: string): BaseNode {
-    const detachedNode = new BaseNode(title);
-    this.detached.push(detachedNode);
-    return detachedNode;
+  addDetachedNode(title: string): BaseNode {
+    const node = new BaseNode(title);
+    this.detachedChildren.push(node);
+    return node;
   }
 
-  deleteDetached(id: string): void {
-    this.detached = removeItemById(id, this.detached);
+  deleteDetachedNode(id: string): void {
+    this.detachedChildren = removeItemById(id, this.detachedChildren);
+  }
+
+  moveFloatingToChild(detachedNode: BaseNode, targetNode: BaseNode): void {
+    targetNode.addChildNode(detachedNode.getTitle());
+    this.deleteDetachedNode(detachedNode.getId());
+  }
+
+  moveChildToFloating(childNode: BaseNode, parentNode: BaseNode): void {
+    parentNode.deleteChildNode(childNode.getId());
+    this.addDetachedNode(childNode.getTitle());
+  }
+
+  moveChildren(node: BaseNode, fromNode: BaseNode, toNode: BaseNode): void {
+    toNode.addChildNode(node.getTitle());
+    fromNode.deleteChildNode(node.getId());
   }
 
   /**
    * MIND MAP RELATIONSHIPS
    */
-  addRelationship(firstEnd: Node, secondEnd: Node): Relationship {
-    const relationship: Relationship = {
-      id: uuidv4(),
-      firstEndId: firstEnd.id,
-      secondEndId: secondEnd.id,
-    };
+  addRelationship(firstEnd: BaseNode, secondEnd: BaseNode): Relationship {
+    const relationship = new Relationship(firstEnd.getId(), secondEnd.getId());
     this.relationships.push(relationship);
     return relationship;
   }
 
   deleteRelationship(id: string): void {
-    this.relationships = removeItemById(id, this.relationships)
+    this.relationships = removeItemById(id, this.relationships);
   }
 
-  updateRelationshipTitle(relationship: Relationship, title: string): void {
-    const foundRelationship = this.findRelationshipById(relationship.id);
-    if (!foundRelationship) return;
-    Object.assign(foundRelationship, { title });
+  deleteByIds(idSet: string[]): void {
+    //delete children
+    this.deleteChildrenByIdSet(idSet)
+    //delete floating
+    this.deleteDetachedByIdSet(idSet)
   }
 
-  updateControlPoints(relationship: Relationship, controlPoints: Points): void {
-    const foundRelationship = this.findRelationshipById(relationship.id);
-    if (!foundRelationship) return;
-    relationship.controlPoints = controlPoints;
+  deleteDetachedNodes(idSet: string[]) {
+    idSet.forEach((item) => {
+      this.deleteDetachedNode(item);
+    });
   }
 
-  updateLineEndPoints(relationship: Relationship, lineEndPoints: Points): void {
-    const foundRelationship = this.findRelationshipById(relationship.id);
-    if (!foundRelationship) return;
-    relationship.lineEndPoints = lineEndPoints;
-  }
-
-  findRelationshipById(id: string): Relationship | undefined {
-    const rootRelationships = this.relationships;
-    const relationshipIndex = rootRelationships.findIndex(
-      (relationship) => relationship.id === id
-    );
-    if (relationshipIndex < 0) return undefined;
-    return rootRelationships[relationshipIndex];
+  deleteDetachedByIdSet(idSet: string[]): void {
+    this.deleteDetachedNodes(idSet);
+    this.detachedChildren.forEach((item) => {
+      item.deleteChildrenByIdSet(idSet)
+    })
   }
 }
