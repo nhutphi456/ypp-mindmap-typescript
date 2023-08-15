@@ -12,7 +12,7 @@ export class MindMap {
     this.root = new RootNode(title);
   }
 
-  displayNode() {
+  displayNode(): void {
     const defaultSpace = this.getDefaultSpace();
     const defaultWidth = this.getDefaultWidth();
     const defaultHeight = this.getDefaultHeight();

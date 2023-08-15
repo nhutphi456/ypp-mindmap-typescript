@@ -93,10 +93,8 @@ describe("Test floating topic", () => {
 
   beforeAll(() => {
     root = initMindMap().getRoot();
-    //create a sub topic for main topic 1
     mainTopic1 = root.getChildren()[0];
     subTopic1 = mainTopic1.addChildNode("Sub topic 1");
-    //create a floating topic
     detachedNode = root.addDetachedNode("Floating topic");
   });
 
