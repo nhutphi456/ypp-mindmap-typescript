@@ -1,3 +1,5 @@
+import { splitArrayInHalf } from "../utils/util";
+import { BaseNode } from "./baseNode";
 import { RootNode } from "./rootNode";
 
 export class MindMap {
@@ -16,10 +18,25 @@ export class MindMap {
     const defaultSpace = this.getDefaultSpace();
     const defaultWidth = this.getDefaultWidth();
     const defaultHeight = this.getDefaultHeight();
+    const rootX = this.root.getPosition().x;
+    const rootY = this.root.getPosition().y;
 
-    this.root.getChildren().forEach((item, index) => {
-      const childPositionX = defaultSpace + defaultWidth;
-      const childPositionY = (defaultSpace + defaultHeight) * index;
+    const [rightNodes, leftNodes] = splitArrayInHalf(this.root.getChildren());
+
+    rightNodes.forEach((item, index) => {
+      const childPositionX = rootX + defaultSpace + defaultWidth;
+      const childPositionY =
+        rootY + defaultSpace - (defaultSpace + defaultHeight) * index;
+      item.setPosition({
+        x: childPositionX,
+        y: childPositionY,
+      });
+    });
+
+    leftNodes.forEach((item, index) => {
+      const childPositionX = rootX - defaultSpace - defaultWidth;
+      const childPositionY =
+        rootY + defaultSpace - (defaultSpace + defaultHeight) * index;
       item.setPosition({
         x: childPositionX,
         y: childPositionY,
@@ -36,6 +53,14 @@ export class MindMap {
   }
 
   getDefaultHeight() {
-    return 150;
+    return 100;
+  }
+
+  getDefault() {
+    const defaultSpace = this.getDefaultSpace();
+    const defaultWidth = this.getDefaultWidth();
+    const defaultHeight = this.getDefaultHeight();
+
+    return { defaultSpace, defaultWidth, defaultHeight}
   }
 }

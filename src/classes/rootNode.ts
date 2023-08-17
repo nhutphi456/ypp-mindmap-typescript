@@ -10,6 +10,7 @@ export class RootNode extends BaseNode {
     super(title);
     this.detachedChildren = [];
     this.relationships = [];
+    this.setPosition({ x: 0, y: 0 });
   }
 
   getRelationships(): Relationship[] {
@@ -45,11 +46,9 @@ export class RootNode extends BaseNode {
     fromNode.deleteChildNode(node.getId());
   }
 
-  /**
-   * MIND MAP RELATIONSHIPS
-   */
-  addRelationship(firstEnd: BaseNode, secondEnd: BaseNode): Relationship {
-    const relationship = new Relationship(firstEnd.getId(), secondEnd.getId());
+  // MIND MAP RELATIONSHIPS
+  addRelationship(firstEndId: string, secondEndId: string): Relationship {
+    const relationship = new Relationship(firstEndId, secondEndId);
     this.relationships.push(relationship);
     return relationship;
   }
@@ -60,9 +59,9 @@ export class RootNode extends BaseNode {
 
   deleteByIds(idSet: string[]): void {
     //delete children
-    this.deleteChildrenByIdSet(idSet)
+    this.deleteChildrenByIdSet(idSet);
     //delete floating
-    this.deleteDetachedByIdSet(idSet)
+    this.deleteDetachedByIdSet(idSet);
   }
 
   deleteDetachedNodes(idSet: string[]) {
@@ -74,7 +73,7 @@ export class RootNode extends BaseNode {
   deleteDetachedByIdSet(idSet: string[]): void {
     this.deleteDetachedNodes(idSet);
     this.detachedChildren.forEach((item) => {
-      item.deleteChildrenByIdSet(idSet)
-    })
+      item.deleteChildrenByIdSet(idSet);
+    });
   }
 }

@@ -207,13 +207,18 @@ describe("Test mind map relationship", () => {
   });
 
   it("should create relationship", () => {
-    relationship1 = root.addRelationship(mainTopic1, subTopic1);
-    relationship2 = root.addRelationship(mainTopic1, mainTopic2);
+    relationship1 = root.addRelationship(mainTopic1.getId(), subTopic1.getId());
+    relationship2 = root.addRelationship(
+      mainTopic1.getId(),
+      mainTopic2.getId()
+    );
 
     expect(root.getRelationships().length).toEqual(2);
   });
 
   it("should delete relationship", () => {
+    expect(root.getRelationships().length).toEqual(2);
+
     root.deleteRelationship(relationship1.id);
 
     expect(root.getRelationships().length).toEqual(1);
@@ -235,30 +240,30 @@ describe("Test mind map relationship", () => {
 });
 
 describe("draw mind map", () => {
-  let xMind: MindMap
+  let xMind: MindMap;
 
   beforeAll(() => {
-    xMind = initMindMap()
-  })
+    xMind = initMindMap();
+  });
 
   it("should display nodes", () => {
-    xMind.displayNode()
-    const root = xMind.getRoot()
-    const mainTopic1 = root.getChildren()[0]
-    const mainTopic2 = root.getChildren()[1]
-    const mainTopic3 = root.getChildren()[2]
-    const mainTopic4 = root.getChildren()[3]
+    xMind.displayNode();
+    const root = xMind.getRoot();
+    const mainTopic1 = root.getChildren()[0];
+    const mainTopic2 = root.getChildren()[1];
+    const mainTopic3 = root.getChildren()[2];
+    const mainTopic4 = root.getChildren()[3];
 
-    expect(mainTopic1.getPosition().x).toEqual(250)
-    expect(mainTopic1.getPosition().y).toEqual(0)
+    expect(mainTopic1.getPosition().x).toEqual(250);
+    expect(mainTopic1.getPosition().y).toEqual(50);
 
-    expect(mainTopic2.getPosition().x).toEqual(250)
-    expect(mainTopic2.getPosition().y).toEqual(200)
+    expect(mainTopic2.getPosition().x).toEqual(250);
+    expect(mainTopic2.getPosition().y).toEqual(-100);
 
-    expect(mainTopic3.getPosition().x).toEqual(250)
-    expect(mainTopic3.getPosition().y).toEqual(400)
+    expect(mainTopic3.getPosition().x).toEqual(-250);
+    expect(mainTopic3.getPosition().y).toEqual(50);
 
-    expect(mainTopic4.getPosition().x).toEqual(250)
-    expect(mainTopic4.getPosition().y).toEqual(600)
-  })
+    expect(mainTopic4.getPosition().x).toEqual(-250);
+    expect(mainTopic4.getPosition().y).toEqual(-100);
+  });
 })
